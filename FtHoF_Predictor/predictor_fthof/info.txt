@@ -1,0 +1,12 @@
+{
+	"Name": "FtHoF Predictor",
+	"ID": "predictor_fthof",
+	"Author": "Santiago Marti Gomez",
+	"Description": "Shows which cookie will appear in the next 'Force the Hand of Fate' directly in the spell's tooltip.",
+	"ModVersion": 1.0,
+	"GameVersion": 2.052,
+	"Date": "01/08/2026",
+	"Dependencies": [],
+	"LanguagePacks": ["EN"],
+	"AllowSteamAchievs": true
+}
