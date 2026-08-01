@@ -17,7 +17,7 @@ An advanced algorithmic trading bot for the Stock Market minigame. It doesn't ju
 *   **Dynamic Bollinger Bands:** Calculates real-time volatility during the *Chaotic* mode to ensure trades always cover the auto-broker commission overhead.
 *   **Injected Dashboard:** Renders a clean, two-column UI directly into the game's DOM to monitor active thresholds and recent trades without cluttering the screen with notifications.
 
-### 🔮 [2. FtHoF Predictor (RNG Seed Evaluation)](./FtHoF-Predictor)
+### 🔮 [2. FtHoF Predictor (RNG Seed Evaluation)](./FtHoF_Predictor)
 A grimoire utility that eliminates the guesswork from the *Force the Hand of Fate* spell, enabling massive combo setups.
 *   **Seed Tracking:** Hooks into the game's internal `Math.seedrandom` state using the current save seed and total spells cast to accurately pre-calculate the RNG roll.
 *   **Seamless UI Injection:** Modifies the native spell tooltip to display the upcoming cookie outcome (*Success* or *Backfire*) directly in the game's interface before casting.
