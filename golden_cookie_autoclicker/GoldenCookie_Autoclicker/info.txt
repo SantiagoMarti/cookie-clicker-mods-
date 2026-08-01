@@ -1,0 +1,12 @@
+{
+	"Name": "Golden Cookie AutoClicker",
+	"ID": "golden_cookie_autoclicker",
+	"Author": "Santiago Marti Gomez",
+	"Description": "Automatically clicks Golden (and Wrath) cookies as soon as they appear on screen.",
+	"ModVersion": 1.0,
+	"GameVersion": 2.052,
+	"Date": "01/08/2026",
+	"Dependencies": [],
+	"LanguagePacks": ["EN"],
+	"AllowSteamAchievs": true
+}
