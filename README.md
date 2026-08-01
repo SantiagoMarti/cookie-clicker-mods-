@@ -38,9 +38,19 @@ Since these are raw JavaScript mods, you can load them directly into your browse
 3. Copy the entire code from the desired `main.js` file and paste it into the console. Hit `Enter`.
 
 **Method B: Bookmarklet (Recommended for daily use)**
-1. Create a new bookmark in your browser.
+1. Right-click on your browser's bookmarks bar and select **"Add Page"** or **"Add Bookmark"**.
 2. Name it after the mod (e.g., "Load Auto Broker").
-3. In the URL field, paste the following code, replacing `YOUR_GITHUB_RAW_LINK` with the raw link to the `main.js` file hosted in this repository:
+3. In the **URL** field, copy and paste the corresponding code block below.
+4. Save it. Now, whenever you have Cookie Clicker open, just click the bookmark to instantly inject and start the mod.
 
-```javascript
-javascript:(function(){var s=document.createElement('script');s.src='YOUR_GITHUB_RAW_LINK';document.head.appendChild(s);}());
+### 📈 1. Auto Broker
+Copy this code into the URL field of your bookmark:
+`javascript:(function(){var s=document.createElement('script');s.src='https://raw.githubusercontent.com/SantiagoMarti/cookie-clicker-mods-/refs/heads/main/auto-broker/AutomaticBroker/main.js';document.head.appendChild(s);}());`
+
+### 🔮 2. FtHoF Predictor
+Copy this code into the URL field of your bookmark:
+`javascript:(function(){var s=document.createElement('script');s.src='https://raw.githubusercontent.com/SantiagoMarti/cookie-clicker-mods-/refs/heads/main/FtHoF_Predictor/predictor_fthof/main.js';document.head.appendChild(s);}());`
+
+### 🖱️ 3. Golden Cookie AutoClicker
+Copy this code into the URL field of your bookmark:
+`javascript:(function(){var s=document.createElement('script');s.src='https://raw.githubusercontent.com/SantiagoMarti/cookie-clicker-mods-/refs/heads/main/golden_cookie_autoclicker/GoldenCookie_Autoclicker/main.js';document.head.appendChild(s);}());`
