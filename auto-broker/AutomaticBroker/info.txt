@@ -1,13 +1,10 @@
 {
-	"Name": "Auto Broker",
+	"Name": "Auto Broker / Optimized Stock Market Bot",
 	"ID": "auto_broker",
 	"Author": "Santiago Marti Gomez",
-	"Description": "Advanced algorithm to automatically buy low and sell high in the stock market.",
-	"ModVersion": 9.0,
+	"Description": "Update 9.2",
+	"ModVersion": 9.2,
 	"GameVersion": 2.052,
-	"Date": "2026-08-01",
-	"Dependencies": [],
 	"Disabled": false,
-	"LanguagePacks": ["EN"],
 	"AllowSteamAchievs": true
 }
