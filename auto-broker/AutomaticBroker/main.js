@@ -1,20 +1,44 @@
 /**
  * Cookie Clicker Auto Broker
- * Version: 9.0
+ * Version: 9.2 (Includes Instant UI Toggle)
  * Description: Advanced High-Frequency Trading algorithm for Cookie Clicker's Stock Market.
  * Features: Zero-latency DOM hooks, FSM trend prediction, Dynamic Bollinger Bands, 
  * Auto-Broker purchasing, and an injected dual-column GUI.
  */
 
+// Variable y función global para que el botón HTML pueda interactuar con el bot al instante
+if (typeof window.autoBrokerActive === 'undefined') {
+    window.autoBrokerActive = true;
+}
+
+// Guardamos las últimas líneas para que la interfaz no parpadee al encender/apagar
+window.lastAutoBrokerDebugLines = [];
+
+window.toggleAutoBroker = function() {
+    window.autoBrokerActive = !window.autoBrokerActive;
+    Game.Notify('Auto Broker', window.autoBrokerActive ? 'Bot RESUMED' : 'Bot PAUSED (Manual Control)', [16, 5]);
+    
+    // Forzar el renderizado instantáneo de la UI sin esperar al bank.tick
+    if (typeof window.forceAutoBrokerRender === 'function') {
+        window.forceAutoBrokerRender();
+    }
+};
+
 Game.registerMod("auto_broker", {
     init: function() {
-        Game.Notify('Auto Broker', 'Algorithm V9 initialized: Full English, State Memory, and Reset Guard active.', [16, 5]); 
+        Game.Notify('Auto Broker', 'Algorithm V9.2 initialized: Instant Toggle active.', [16, 5]); 
         setTimeout(() => { this.startBroker(); }, 5000);
     },
 
     startBroker: function() {
         let bank = Game.Objects['Bank'].minigame;
         if (!bank) return;
+
+        // Exponer el renderizador al ámbito global para el botón
+        window.forceAutoBrokerRender = () => {
+            let currentOverhead = 1 + 0.01 * (20 * Math.pow(0.95, bank.brokers));
+            renderUI(window.lastAutoBrokerDebugLines, currentOverhead);
+        };
 
         // Shortened mode names for compact UI rendering
         const MODE_NAMES = ['Stable', 'S. Rise', 'S. Fall', 'F. Rise', 'F. Fall', 'Chaotic'];
@@ -41,8 +65,17 @@ Game.registerMod("auto_broker", {
                 host.appendChild(panelUI);
             }
 
+            // Variables de estilo dinámicas para el botón
+            let btnText = window.autoBrokerActive ? 'ON' : 'OFF';
+            let btnColor = window.autoBrokerActive ? '#94cd50' : '#ff3b3b';
+
             let html = `
-                <div style="font-weight: bold; color: #94cd50; margin-bottom: 4px; font-size: 14px;">🎯 Auto Broker V9 | Current Overhead: ${((overhead - 1) * 100).toFixed(2)}%</div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; font-weight: bold; color: #94cd50; margin-bottom: 4px; font-size: 14px;">
+                    <span>🎯 Auto Broker V9.2 | Current Overhead: ${((overhead - 1) * 100).toFixed(2)}%</span>
+                    <button onclick="window.toggleAutoBroker()" style="background: ${btnColor}; color: black; border: 1px solid #fff; border-radius: 4px; padding: 2px 10px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                        Auto Broker: ${btnText}
+                    </button>
+                </div>
                 <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 6px; font-size: 14px;">
                     <span><b>Buys:</b> ${stats.buys}</span>
                     <span><b>Sells:</b> ${stats.sells}</span>
@@ -53,7 +86,7 @@ Game.registerMod("auto_broker", {
                 <hr style="border: 0; height: 1px; background: #555; margin: 8px 0;">
                 
                 <div style="font-family: monospace; font-size: 12px; text-align: left; max-height: 200px; overflow-y: auto; column-count: 2; column-gap: 20px; column-rule: 1px solid #555; padding: 4px;">
-                    ${debugLines.length > 0 ? debugLines.join('') : 'Analyzing thresholds...'}
+                    ${window.autoBrokerActive ? (debugLines.length > 0 ? debugLines.join('') : 'Analyzing thresholds...') : '<div style="color:#ff3b3b; text-align:center; width:100%; column-span: all; font-weight:bold;">Status: PAUSED (Manual Control)</div>'}
                 </div>
             `;
             
@@ -121,10 +154,18 @@ Game.registerMod("auto_broker", {
             // Guard against the 15-tick synchronous pre-warming loop on reset/ascension
             if (bank.ticks <= 15) return;
 
+            let overhead = 1 + 0.01 * (20 * Math.pow(0.95, bank.brokers));
+
+            // Si el bot está apagado, bloqueamos la ejecución pero mantenemos la UI actualizada con las cifras
+            if (!window.autoBrokerActive) {
+                renderUI(window.lastAutoBrokerDebugLines, overhead);
+                return;
+            }
+
             let bankLevel = Game.Objects['Bank'].level;
             let assets = bank.goodsById; 
             
-            // Auto-Broker Routine (Fills brokers if cost is < 5% of current bank)
+            // Auto-Broker Routine
             let maxBrokers = bank.getMaxBrokers();
             while (bank.brokers < maxBrokers) {
                 let brokerPrice = bank.getBrokerPrice();
@@ -134,7 +175,8 @@ Game.registerMod("auto_broker", {
                 } else { break; }
             }
 
-            let overhead = 1 + 0.01 * (20 * Math.pow(0.95, bank.brokers));
+            // Recalculate overhead in case brokers were just bought
+            overhead = 1 + 0.01 * (20 * Math.pow(0.95, bank.brokers));
             let softCeiling = 100 + (bankLevel - 1) * 3;
             let debugLines = [];
 
@@ -159,7 +201,7 @@ Game.registerMod("auto_broker", {
                     if (executeBuy(asset)) tickAction = 'buy';
                 } 
                 else if (asset.mode === 1 && lastMode !== 1 && asset.val < fomoLimit && asset.stock < bank.getGoodMaxStock(asset)) {
-                    // FOMO Buy (Slow Rise Transition) - Buy immediately when entering Mode 1
+                    // FOMO Buy (Slow Rise Transition)
                     if (executeBuy(asset)) tickAction = 'buy';
                 }
                 else if (asset.val <= buyThreshold && asset.stock < bank.getGoodMaxStock(asset)) {
@@ -176,13 +218,15 @@ Game.registerMod("auto_broker", {
                 if (tickAction === 'buy') textColor = '#94cd50'; 
                 else if (tickAction === 'sell') textColor = '#ff3b3b'; 
 
-                // Format pricing strings (B: and S:)
+                // Format pricing strings
                 let strSell = sellThreshold >= 999999 ? 'N/A' : '$' + sellThreshold.toFixed(1);
                 let strBuy = '$' + buyThreshold.toFixed(1);
 
                 debugLines.push(`<div style="color: ${textColor}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 1px 0;">[${asset.symbol}] ${MODE_NAMES[asset.mode]} | B: ${strBuy} | S: ${strSell}</div>`);
             });
 
+            // Guardamos las líneas globalmente y renderizamos
+            window.lastAutoBrokerDebugLines = debugLines;
             renderUI(debugLines, overhead);
         };
 
